@@ -53,7 +53,7 @@ cubes:
 
     measures:
       - name: SoiGmv
-        sql: soi_gmv
+        sql: soi_total_gmv
         type: sum
 
       - name: SoiSellingGmv

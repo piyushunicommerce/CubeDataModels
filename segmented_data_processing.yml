@@ -1,0 +1,68 @@
+cubes:
+  - name: segmented_data_processing
+    sql_table: insights_o2sla
+
+    dimensions:
+      - name: tenant
+        sql: tenant
+        type: string
+
+      - name: channel_code
+        sql: channel_code
+        type: string
+
+      - name: channel_source_code
+        sql: channel_source_code
+        type: string
+      
+      - name: facility
+        sql: facility
+        type: string
+
+    measures:
+      - name: dt_shipments
+        sql: dispatch_time
+        type: count
+
+      - name : shipment_count
+        type: count
+
+      - name : total_breached_shipments
+        sql: case when fulfillment_time < packing_timestamp  then 1 else 0 end
+        type: count
+
+    segments:
+      - name: yesterday
+        sql: "segmented_data_processing.packing_timestamp >= current_date - INTERVAL '1 DAY' and segmented_data_processing.packing_timestamp < current_date"
+      - name: last7days
+        sql: "segmented_data_processing.packing_timestamp >= current_date - INTERVAL '7 DAY' and segmented_data_processing.packing_timestamp < current_date"
+      - name: last30days
+        sql: "segmented_data_processing.packing_timestamp >= current_date - INTERVAL '30 DAY' and segmented_data_processing.packing_timestamp < current_date"
+      - name: prevmonth
+        sql: "segmented_data_processing.packing_timestamp >= date_trunc('month', current_date - interval '1' month) and segmented_data_processing.packing_timestamp < date_trunc('month', current_date - interval '0' month)"
+      - name: monthtodate
+        sql: "segmented_data_processing.packing_timestamp >= date_trunc('month', current_date - interval '0' month) and segmented_data_processing.packing_timestamp < current_date"
+
+    pre_aggregations:
+      - name: agg_yesterday
+        dimensions:
+          - tenant
+          - channel_code
+          - channel_source_code
+          - facility
+        measures:
+          - dt_shipments
+          - shipment_count
+          - total_breached_shipments
+        segments:
+          - segmented_data_processing.yesterday
+          - segmented_data_processing.last7days
+          - segmented_data_processing.last30days
+          - segmented_data_processing.prevmonth
+          - segmented_data_processing.monthtodate
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+        refresh_key:
+          every: 30 8 * * *
