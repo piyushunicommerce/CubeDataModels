@@ -1,0 +1,67 @@
+cubes:
+  - name: tenant_facility_channel
+    sql: select a.tenant,a.facility,a.channel_code,a.channel_source_code,b.brand,b.category from insights_daily_sales_ledger a join insights_sku_details b on a.tenant = b.tenant and a.sku_code = b.sku_code
+
+    dimensions:
+      - name: tenant
+        sql: tenant
+        type: string
+
+      - name: facility
+        sql: facility
+        type: time
+
+      - name: channel_code
+        sql: channel_code
+        type: string
+
+      - name: channel_source_code
+        sql: channel_source_code
+        type: string
+
+      - name: Brand
+        sql: brand
+        type: string
+
+      - name: Category
+        sql: category
+        type: string
+
+    pre_aggregations:
+      - name: tenant_facility
+        dimensions:
+          - tenant
+          - facility
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+        refresh_key:
+          every: 0 9 * * *
+          timezone: Asia/Kolkata
+
+      - name: tenant_channel
+        dimensions:
+          - tenant
+          - channel_source_code
+          - channel_code
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+        refresh_key:
+          every: 10 9 * * *
+          timezone: Asia/Kolkata
+
+      - name: tenant_brand_category
+        dimensions:
+          - tenant
+          - Brand
+          - Category
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+        refresh_key:
+          every: 20 9 * * *
+          timezone: Asia/Kolkata

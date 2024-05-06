@@ -1,0 +1,66 @@
+cubes:
+  - name: daily_orders
+    sql_table: insights_daily_orders_ledger
+
+    dimensions:
+      - name: tenant
+        sql: tenant
+        type: string
+
+      - name: OrderCreatedDate
+        sql: channel_order_created_date
+        type: time
+
+      - name: channel_code
+        sql: channel_code
+        type: string
+
+      - name: channel_source_code
+        sql: channel_source_code
+        type: string
+
+    measures:
+
+      - name: OrderCount
+        sql: order_count
+        type: sum
+
+      - name: GMV
+        sql: order_gmv
+        type: sum
+   
+      - name: OrderItemCount
+        sql: order_item_count
+        type: sum
+
+    segments:
+      - name: Last30Days
+        sql: "daily_orders.channel_order_created_date >= current_date - INTERVAL '30 DAY' and daily_orders.channel_order_created_date < current_date"
+      
+
+    pre_aggregations:
+      - name: orders
+        dimensions:
+          - tenant
+          - OrderCreatedDate
+          - channel_code
+          - channel_source_code
+        measures:
+          - OrderCount
+          - GMV
+          - OrderItemCount
+        segments:
+          - daily_orders.Last30Days
+        time_dimension: OrderCreatedDate
+        granularity: day
+        partition_granularity: month
+        allow_non_strict_date_range_match: true
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+        refresh_key:
+          every: 0 9 * * *
+          timezone: Asia/Kolkata
+          incremental: true
+          update_window: 5 day

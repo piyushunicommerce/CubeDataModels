@@ -1,0 +1,214 @@
+cubes:
+  - name: daily_sales
+    sql: select idsl.*,isd.brand,isd.category from insights_sku_details isd join insights_daily_sales_ledger idsl on isd.sku_code = idsl.sku_code and isd.tenant = idsl.tenant
+
+    dimensions:
+      - name: tenant
+        sql: tenant
+        type: string
+
+      - name: OrderCreatedDate
+        sql: sale_order_created_date
+        type: time
+
+      - name: channel_code
+        sql: channel_code
+        type: string
+
+      - name: channel_source_code
+        sql: channel_source_code
+        type: string
+      
+      - name: facility
+        sql: facility
+        type: string
+
+      - name: Brand
+        sql: brand
+        type: string
+
+      - name: Category
+        sql: category
+        type: string
+      
+      - name: PaymentMethod
+        sql: payment_method
+        type: string
+
+      - name: FacilityPincode
+        sql: facility_pincode
+        type: string
+
+      - name: FacilityCountryCode
+        sql: facility_country_code
+        type: string
+
+      - name: CustomerPincode
+        sql: customer_pincode
+        type: string
+
+      - name: CustomerCountryCode
+        sql: customer_country_code
+        type: string
+
+    measures:
+      - name: SoiGmv
+        sql: soi_gmv
+        type: sum
+
+      - name: SoiSellingGmv
+        sql: soi_selling_gmv
+        type: sum
+
+      - name: InvoiceItemCount
+        sql: invoiced_item_count
+        type: sum
+
+      - name: InvoiceItemGmv
+        sql: invoiced_item_gmv
+        type: sum
+
+      - name: SoiCount
+        sql: soi_count
+        type: sum
+
+      - name: SoiCost
+        sql: soi_cost
+        type: sum
+
+      - name: CancelledItemCount
+        sql: cancelled_item_count
+        type: sum
+
+      - name: CancelledItemGmv
+        sql: cancelled_item_gmv
+        type: sum
+
+      - name: PostInvoiceCancelledItemCount
+        sql: post_invoiced_cancelled_item_count
+        type: sum
+
+      - name: PostInvoiceCancelledItemGmv
+        sql: post_invoiced_cancelled_item_gmv
+        type: sum
+
+      - name: PreInvoiceCancelledItemCount
+        sql: cancelled_item_count - post_invoiced_cancelled_item_count
+        type: sum
+
+      - name: PreInvoiceCancelledItemGmv
+        sql: cancelled_item_gmv - post_invoiced_cancelled_item_gmv
+        type: sum
+
+      - name: CirItemCount
+        sql: cir_item_count
+        type: sum
+
+      - name: CirItemGmv
+        sql: cir_item_gmv
+        type: sum
+
+      - name: RtoItemCount
+        sql: rto_item_count
+        type: sum
+
+      - name: RtoItemGmv
+        sql: rto_item_gmv
+        type: sum
+      
+      - name: Discount
+        sql: soi_discount
+        type: sum
+
+      - name: DispatchedItemCount
+        sql: dispatched_item_count
+        type: sum
+
+      - name: DispatchedItemGmv
+        sql: dispatched_item_gmv
+        type: sum
+
+      - name: NetCount
+        sql: dispatched_item_count - cir_item_count - rto_item_count
+        type: sum
+
+      - name: NetGMV
+        sql: dispatched_item_gmv - cir_item_gmv - rto_item_gmv
+        type: sum
+
+    segments:
+      - name: Last30Days
+        sql: "daily_sales.sale_order_created_date >= current_date - INTERVAL '30 DAY' and daily_sales.sale_order_created_date < current_date"
+      
+    pre_aggregations:
+      - name: gmv
+        dimensions:
+          - tenant
+          - OrderCreatedDate
+          - channel_code
+          - channel_source_code
+          - facility
+          - Brand
+          - Category
+        measures:
+          - SoiGmv
+          - InvoiceItemGmv
+          - SoiCost
+          - CancelledItemGmv
+          - PostInvoiceCancelledItemCount
+          - PreInvoiceCancelledItemCount
+          - CirItemGmv
+          - RtoItemGmv
+          - Discount
+          - DispatchedItemGmv
+          - NetGMV
+        segments:
+          - daily_sales.Last30Days
+        time_dimension: OrderCreatedDate
+        granularity: day
+        partition_granularity: month
+        allow_non_strict_date_range_match: true
+        refresh_key:
+          every: 0 5 * * *
+          timezone: Asia/Kolkata
+          incremental: true
+          update_window: 15 day
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+
+      - name: quantity
+        dimensions:
+          - tenant
+          - OrderCreatedDate
+          - channel_code
+          - channel_source_code
+          - facility
+          - Brand
+          - Category
+        measures:
+          - SoiCount
+          - InvoiceItemCount
+          - CancelledItemCount
+          - PostInvoiceCancelledItemGmv
+          - PreInvoiceCancelledItemGmv
+          - CirItemCount
+          - RtoItemCount
+          - DispatchedItemCount
+          - NetCount
+        segments:
+          - daily_sales.Last30Days
+        time_dimension: OrderCreatedDate
+        granularity: day
+        partition_granularity: month
+        allow_non_strict_date_range_match: true
+        refresh_key:
+          every: 0 6 * * *
+          timezone: Asia/Kolkata
+          incremental: true
+          update_window: 15 day
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
