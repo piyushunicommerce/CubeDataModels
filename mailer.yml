@@ -91,7 +91,7 @@ cubes:
             columns: 
               - tenant
         refresh_key:
-          every: 30 4 * * *
+          every: 30 6 * * *
           timezone: Asia/Kolkata
 
       - name: fulfillment
@@ -115,5 +115,5 @@ cubes:
             columns: 
               - tenant
         refresh_key:
-          every: 0 5 * * *
+          every: 0 6 * * *
           timezone: Asia/Kolkata

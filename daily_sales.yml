@@ -169,7 +169,7 @@ cubes:
         partition_granularity: month
         allow_non_strict_date_range_match: true
         refresh_key:
-          every: 0 5 * * *
+          every: 30 7 * * *
           timezone: Asia/Kolkata
           incremental: true
           update_window: 15 day
@@ -204,7 +204,7 @@ cubes:
         partition_granularity: month
         allow_non_strict_date_range_match: true
         refresh_key:
-          every: 0 6 * * *
+          every: 0 7 * * *
           timezone: Asia/Kolkata
           incremental: true
           update_window: 15 day

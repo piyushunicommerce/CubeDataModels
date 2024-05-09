@@ -25,6 +25,7 @@ cubes:
         type: count
 
       - name : shipment_count
+        sql: packing_timestamp
         type: count
 
       - name : total_breached_shipments
@@ -65,4 +66,5 @@ cubes:
             columns: 
               - tenant
         refresh_key:
-          every: 30 8 * * *
+          every: 30 5 * * *
+          timezone: Asia/Kolkata
