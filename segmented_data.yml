@@ -33,7 +33,7 @@ cubes:
 
       - name : total_breached_shipments
         sql: case when EXTRACT(EPOCH FROM (fulfillment_time - channel_order_creation_time)) / 60 < (shipment_creation_time + picklist_creation_time + picking_time + packing_time)  then 1 else 0 end
-        type: count
+        type: sum
 
     segments:
       - name: yesterday

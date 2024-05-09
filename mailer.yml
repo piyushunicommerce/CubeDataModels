@@ -1,0 +1,119 @@
+cubes:
+  - name: mailer
+    sql_table: mailer_sales
+
+    dimensions:
+      - name: tenant
+        sql: tenant
+        type: string
+
+      - name: TAT
+        sql: tat
+        type: time
+      
+      - name: Date
+        sql: date
+        type: time
+
+      - name: channel_source_code
+        sql: channel_source
+        type: string
+      
+      - name: facility
+        sql: facility
+        type: string
+
+      - name: Flag1
+        sql: case when flag = 'Total' then 'Ordered (Lacs ₹)' when flag = 'SP' then 'Shipped (Lacs ₹)' when flag = 'CIR' then 'CIR Created (Lacs ₹)' when flag = 'RTO' then 'RTO Created (Lacs ₹)' end
+        type: string
+
+      - name: Flag2
+        sql: case when flag = 'Total' then 'Ordered' when flag = 'SP' then 'Shipped' when flag = 'CIR' then 'CIR Created' when flag = 'RTO' then 'RTO Created' end
+        type: string
+ 
+      - name: pendency
+        sql: case when status in ('DISPATCHED','DELIVERED','REPLACED','RESHIPPED') then 'DISPATCHED' when status = 'CANCELLED' then 'CANCELLED' else 'PENDING' end
+        type: string
+
+      - name: status
+        sql: case when status in ('DISPATCHED','DELIVERED','REPLACED','RESHIPPED') then 'DISPATCHED' when status in ('PICKING_FOR_INVOICING','STAGED') then 'PICKING_FOR_INVOICING' else status end
+        type: string
+
+    measures:
+      - name: gmv
+        sql: gmv
+        type: sum
+
+      - name: quantity
+        sql: qty
+        type: sum
+    
+    segments:
+      - name: yesterday
+        sql: "mailer.date >= current_date - INTERVAL '1 DAY' and mailer.date < current_date"
+      - name: yesterday_tat
+        sql: "mailer.tat >= current_date - INTERVAL '1 DAY' and mailer.tat < current_date"
+      - name: last7day
+        sql: "mailer.date >= current_date - INTERVAL '7 DAY' and mailer.date < current_date"
+      - name: last7day_tat
+        sql: "mailer.tat >= current_date - INTERVAL '7 DAY' and mailer.tat < current_date"
+      - name: lmtd
+        sql: "mailer.date >= date_trunc('month', current_date - interval '2' month) and mailer.date < current_date - interval '1' month"
+      - name: mtd
+        sql: "mailer.date >= date_trunc('month', current_date - interval '0' month) and mailer.date < current_date"
+      - name: cancelled_status
+        sql: status != 'CANCELLED'
+      - name: flag_segment
+        sql: flag = 'Total'
+      - name: discarded_status
+        sql: status not in ('ALTERNATE_ACCEPTED','ALTERNATE_SUGGESTED','LOCATION_NOT_SERVICEABLE')
+
+    pre_aggregations:
+      - name: sales
+        dimensions:
+          - tenant
+          - channel_source_code
+          - facility  
+          - Flag1
+          - Flag2
+        measures:
+          - gmv
+          - quantity
+        segments:
+          - yesterday
+          - last7day
+          - mtd
+          - lmtd
+          - cancelled_status
+          - flag_segment
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+        refresh_key:
+          every: 30 4 * * *
+          timezone: Asia/Kolkata
+
+      - name: fulfillment
+        dimensions:
+          - tenant
+          - channel_source_code
+          - facility  
+          - TAT
+          - pendency
+          - status
+        measures:
+          - quantity
+        segments:
+          - yesterday_tat
+          - last7day_tat
+          - cancelled_status
+          - flag_segment
+          - discarded_status
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+        refresh_key:
+          every: 0 5 * * *
+          timezone: Asia/Kolkata

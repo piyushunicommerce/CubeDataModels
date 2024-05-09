@@ -1,0 +1,97 @@
+cubes:
+  - name: o2s_sla_aggregate_processing
+    sql_table: insights_o2sla
+
+    dimensions:
+      - name: tenant
+        sql: tenant
+        type: string
+
+      - name: InvoiceDate
+        sql: packing_timestamp
+        type: time
+
+      - name: channel_code
+        sql: channel_code
+        type: string
+
+      - name: channel_source_code
+        sql: channel_source_code
+        type: string
+      
+      - name: facility
+        sql: facility
+        type: string
+
+    measures:
+      - name: shipment_count
+        type: count
+
+      - name: picking_time
+        sql: picking_time
+        type: sum
+
+      - name: pt_shipments
+        sql: picking_time
+        type: count
+
+      - name: packing_time
+        sql: packing_time
+        type: sum
+      
+      - name: pat_shipments
+        sql: packing_time
+        type: count
+
+      - name: manifest_time
+        sql: manifest_time 
+        type: sum
+
+      - name: mt_shipments
+        sql: manifest_time 
+        type: count
+
+      - name: dispatch_time
+        sql: dispatch_time
+        type: sum
+
+      - name: dt_shipments
+        sql: dispatch_time
+        type: count
+
+      - name : total_breached_shipments
+        sql: case when fulfillment_time < packing_timestamp  then 1 else 0 end
+        type: sum
+
+    pre_aggregations:
+      - name: drill_down
+        dimensions:
+          - tenant
+          - InvoiceDate
+          - channel_code
+          - channel_source_code
+          - facility  
+        measures:
+          - picking_time
+          - pt_shipments
+          - packing_time
+          - pat_shipments
+          - manifest_time
+          - mt_shipments
+          - dispatch_time
+          - dt_shipments
+          - total_breached_shipments
+          - shipment_count
+        time_dimension: InvoiceDate
+        granularity: day
+        partition_granularity: month
+        allow_non_strict_date_range_match: true
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+        refresh_key:
+          every: 30 6 * * *
+          timezone: Asia/Kolkata
+          incremental: true
+          update_window: 15 day

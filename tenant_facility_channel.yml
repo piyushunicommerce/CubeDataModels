@@ -9,7 +9,7 @@ cubes:
 
       - name: facility
         sql: facility
-        type: time
+        type: string
 
       - name: channel_code
         sql: channel_code
