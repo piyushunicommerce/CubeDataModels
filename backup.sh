@@ -16,4 +16,4 @@ git add .
 git commit -m "$COMMIT_MESSAGE"
 
 # Push changes to the specified branch
-git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/$(REPO).git "$BRANCH"
+git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/${REPO}.git "$BRANCH"
