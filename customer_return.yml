@@ -1,0 +1,111 @@
+cubes:
+  - name: customer_returns
+    sql: select b.tenant,b.sku_code,b.facility,b.channel_source_code,b.channel_code,c.name,c.brand,c.category,b.return_reason as sub_category,d.category as main_category,d.actionable,b.rpi_count,b.rpi_gmv,(a.dispatched_count/b.window_count) as dispatched_count,(a.dispatched_gmv/b.window_count) as dispatched_gmv from (select tenant,sku_code,facility,channel_source_code,channel_code,sum(dispatched_item_count) as dispatched_count,sum(dispatched_item_gmv) as dispatched_gmv from insights_daily_sales_ledger where sale_order_created_date >= current_date - interval '2 day' - interval '1 month' and sale_order_created_date < current_date - interval '2 day' group by 1,2,3,4,5) a join (select tenant,facility,channel_code,channel_source_code,sku_code,return_reason,COUNT(*) OVER (PARTITION BY tenant,facility,channel_code,sku_code) AS window_count,sum(gmv) as rpi_gmv,sum(rpi_count) as rpi_count from insights_return_reasons where date(order_date) >= current_date - interval '2 day' - interval '1 month' and date(order_date) < current_date - interval '2 day' group by 1,2,3,4,5,6 ) b on a.tenant = b.tenant and a.sku_code = b.sku_code and a.facility = b.facility and a.channel_code = b.channel_code join insights_sku_details c on b.tenant = c.tenant and b.sku_code = c.sku_code join mapped_reasons d on b.return_reason = d.sub_category
+
+    dimensions:
+      - name: tenant
+        sql: tenant
+        type: string
+
+      - name: channel_code
+        sql: channel_code
+        type: string
+
+      - name: channel_source_code
+        sql: channel_source_code
+        type: string
+      
+      - name: facility
+        sql: facility
+        type: string
+
+      - name: Product
+        sql: name
+        type: string
+
+      - name: sku_code
+        sql: sku_code
+        type: string
+
+      - name: Brand
+        sql: brand
+        type: string
+
+      - name: Category
+        sql: category
+        type: string
+
+      - name: SubReason
+        sql: sub_category
+        type: string
+
+      - name: MainReason
+        sql: main_category
+        type: string
+
+      - name: Actionable
+        sql: actionable
+        type: string
+
+    measures:
+      - name: ReturnGMV
+        sql: rpi_gmv
+        type: sum
+
+      - name: ReturnCount
+        sql: rpi_count
+        type: sum
+
+      - name: DispatchedGMV
+        sql: dispatched_gmv
+        type: sum
+
+      - name: DispatchedCount
+        sql: dispatched_count
+        type: sum
+
+    pre_aggregations:
+      - name: return_overall
+        dimensions:
+          - tenant
+          - channel_source_code
+          - facility
+          - sku_code
+          - Brand
+          - Category
+          - Product
+        measures:
+          - ReturnGMV
+          - ReturnCount
+          - DispatchedGMV
+          - DispatchedCount
+        refresh_key:
+          every: 40 10 * * *
+          timezone: Asia/Kolkata
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+
+      - name: return_reasons_categorised
+        dimensions:
+          - tenant
+          - channel_source_code
+          - Product
+          - sku_code
+          - MainReason
+          - SubReason
+          - Actionable
+          - Brand
+          - Category
+        measures:
+          - ReturnGMV
+          - ReturnCount
+        refresh_key:
+          every: 0 11 * * *
+          timezone: Asia/Kolkata
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
+

@@ -162,6 +162,8 @@ cubes:
           - Discount
           - DispatchedItemGmv
           - NetGMV
+          - NetCount
+          - SoiCount
         segments:
           - daily_sales.Last30Days
         time_dimension: OrderCreatedDate
@@ -169,7 +171,7 @@ cubes:
         partition_granularity: month
         allow_non_strict_date_range_match: true
         refresh_key:
-          every: 30 7 * * *
+          every: 0 7 * * *
           timezone: Asia/Kolkata
           incremental: true
           update_window: 15 day
@@ -204,7 +206,7 @@ cubes:
         partition_granularity: month
         allow_non_strict_date_range_match: true
         refresh_key:
-          every: 0 7 * * *
+          every: 30 7 * * *
           timezone: Asia/Kolkata
           incremental: true
           update_window: 15 day

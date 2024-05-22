@@ -70,5 +70,5 @@ cubes:
             columns: 
               - tenant
         refresh_key:
-          every: 0 4 * * *
+          every: 30 4 * * *
           timezone: Asia/Kolkata
