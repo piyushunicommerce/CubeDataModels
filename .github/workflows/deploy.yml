@@ -19,5 +19,5 @@ jobs:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         ARGS: "-avz --delete"
         SOURCE: "/Users/piyush/Documents/Unicommerce/CubeDataModels/"
-        TARGET: "user@server:/path/to/target/directory"
+        TARGET: "piyush.singh@cubeprod-in.unicommerce.infra:/opt/cubejs/schema/cubes/"
 
