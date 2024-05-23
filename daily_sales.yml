@@ -174,7 +174,7 @@ cubes:
           every: 0 7 * * *
           timezone: Asia/Kolkata
           incremental: true
-          update_window: 15 day
+          update_window: 150 day
         indexes:
           - name: tenant_index
             columns: 
@@ -209,7 +209,7 @@ cubes:
           every: 30 7 * * *
           timezone: Asia/Kolkata
           incremental: true
-          update_window: 15 day
+          update_window: 150 day
         indexes:
           - name: tenant_index
             columns: 

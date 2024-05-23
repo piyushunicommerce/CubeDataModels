@@ -63,4 +63,4 @@ cubes:
           every: 0 8 * * *
           timezone: Asia/Kolkata
           incremental: true
-          update_window: 5 day
+          update_window: 150 day
