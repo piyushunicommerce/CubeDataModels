@@ -80,7 +80,7 @@ cubes:
           - DispatchedGMV
           - DispatchedCount
         refresh_key:
-          every: 40 10 * * *
+          every: 10 14 * * *
           timezone: Asia/Kolkata
         indexes:
           - name: tenant_index
@@ -102,7 +102,7 @@ cubes:
           - ReturnGMV
           - ReturnCount
         refresh_key:
-          every: 0 11 * * *
+          every: 15 14 * * *
           timezone: Asia/Kolkata
         indexes:
           - name: tenant_index
