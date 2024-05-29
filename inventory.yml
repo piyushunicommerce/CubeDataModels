@@ -1,0 +1,56 @@
+cubes:
+  - name: inventory_snapshot
+    sql: select iis.tenant,iis.facility,iis.sku_code,iis.inventory,idsl.daily_avg,idsl.daily_count,idsl.gross_gmv,idsl.gross_count from (select tenant,facility,sku_code,inventory from insights_inventory_snapshot) iis left join (select tenant,facility,sku_code,avg(gmv) as daily_avg,avg(count) as daily_count,sum(gmv) as gross_gmv,sum(count) as gross_count from (select tenant,facility,sku_code,sale_order_created_date,sum(soi_total_gmv) as gmv,sum(soi_count) as count from insights_daily_sales_ledger where date(sale_order_created_date) >= current_date - interval '30 days' group by 1,2,3,4 ) a group by 1,2,3) idsl on idsl.tenant = iis.tenant and idsl.facility = iis.facility and idsl.sku_code = iis.sku_code
+
+    dimensions:
+      - name: tenant
+        sql: tenant
+        type: string
+
+      - name: facility
+        sql: facility
+        type: string
+
+      - name: sku_code
+        sql: sku_code
+        type: string
+
+    measures:
+      - name: Inventory
+        sql: inventory
+        type: sum
+
+      - name: DailyAvgGMV
+        sql: daily_avg
+        type: sum
+
+      - name: DailyAvgCount
+        sql: daily_count
+        type: sum
+
+      - name: GrossGMV
+        sql: gross_gmv
+        type: sum
+
+      - name: GrossCount
+        sql: gross_count
+        type: sum
+
+    pre_aggregations:
+      - name: snapshot
+        dimensions:
+          - tenant
+          - facility
+          - sku_code
+        measures:
+          - Inventory
+          - DailyAvgCount
+          - GrossGMV
+          - GrossCount
+        refresh_key:
+          every: 15 13 * * *
+          timezone: Asia/Kolkata
+        indexes:
+          - name: tenant_index
+            columns: 
+              - tenant
