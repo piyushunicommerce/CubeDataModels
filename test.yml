@@ -1,0 +1,45 @@
+cubes:
+  - name: test
+    sql_table: insights_return_reasons
+
+    dimensions:
+      - name: tenant
+        sql: tenant
+        type: string
+
+      - name: facility
+        sql: facility
+        type: string
+
+      - name: sku_code
+        sql: sku_code
+        type: string
+
+      - name: SubReason
+        sql: return_reason
+        type: string
+
+    measures:
+      - name: ReturnGMV
+        sql: rpi_gmv
+        type: sum
+
+      - name: ReturnCount
+        sql: rpi_count
+        type: sum
+
+    pre_aggregations:
+      - name: test
+        dimensions:
+          - tenant
+          - facility
+          - sku_code
+          - SubReason
+        measures:
+          - ReturnGMV
+          - ReturnCount
+        refresh_key:
+          every: 0 15 * * *
+          timezone: Asia/Kolkata
+        partition_granularity: tenant
+
