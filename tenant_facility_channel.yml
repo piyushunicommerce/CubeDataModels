@@ -1,6 +1,6 @@
 cubes:
   - name: tenant_facility_channel
-    sql: select a.tenant,a.facility,a.channel_code,a.channel_source_code,b.brand,b.category from insights_daily_sales_ledger a join insights_sku_details b on a.tenant = b.tenant and a.sku_code = b.sku_code
+    sql: select a.tenant,a.facility,a.channel_code,a.channel_source_code,b.brand,b.category from insights_daily_sales_ledger a left join insights_sku_details b on a.tenant = b.tenant and a.sku_code = b.sku_code
 
     dimensions:
       - name: tenant

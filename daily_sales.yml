@@ -1,6 +1,6 @@
 cubes:
   - name: daily_sales
-    sql: select idsl.*,isd.brand,isd.category from insights_sku_details isd join insights_daily_sales_ledger idsl on isd.sku_code = idsl.sku_code and isd.tenant = idsl.tenant
+    sql: select idsl.*,isd.brand,isd.category from insights_sku_details isd right join insights_daily_sales_ledger idsl on isd.sku_code = idsl.sku_code and isd.tenant = idsl.tenant
 
     dimensions:
       - name: tenant

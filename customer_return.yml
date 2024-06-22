@@ -1,8 +1,7 @@
 cubes:
   - name: customer_returns
     sql: select * from insights_return_reasons a join (select distinct sub_category,category as main_category,actionable from mapped_reasons) b on a.return_reason = b.sub_category
-
-
+    
     dimensions:
       - name: tenant
         sql: tenant
