@@ -96,7 +96,7 @@ cubes:
             columns: 
               - tenant
         refresh_key:
-          every: 0 4 * * *
+          every: 30 5 * * *
           timezone: Asia/Kolkata
           incremental: true
           update_window: 360 day
