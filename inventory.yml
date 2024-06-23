@@ -48,7 +48,7 @@ cubes:
           - GrossGMV
           - GrossCount
         refresh_key:
-          every: 15 10 * * *
+          every: 0 15 * * *
           timezone: Asia/Kolkata
         indexes:
           - name: tenant_index

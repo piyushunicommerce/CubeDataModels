@@ -74,7 +74,7 @@ cubes:
           - GrossNet
           - GrossNetGMV
         refresh_key:
-          every: 30 10 * * *
+          every: 30 15 * * *
           timezone: Asia/Kolkata
         indexes:
           - name: tenant_index
