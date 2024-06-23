@@ -37,7 +37,7 @@ cubes:
             columns: 
               - tenant
         refresh_key:
-          every: 0 10 * * *
+          every: 0 16 * * *
           timezone: Asia/Kolkata
 
       - name: tenant_channel
@@ -50,7 +50,7 @@ cubes:
             columns: 
               - tenant
         refresh_key:
-          every: 05 10 * * *
+          every: 20 16 * * *
           timezone: Asia/Kolkata
 
       - name: tenant_brand_category
@@ -63,5 +63,5 @@ cubes:
             columns: 
               - tenant
         refresh_key:
-          every: 10 10 * * *
+          every: 40 16 * * *
           timezone: Asia/Kolkata
